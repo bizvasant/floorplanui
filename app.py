@@ -30,4 +30,5 @@ def display_page(pathname=index_page):
         return index_page
 
 if __name__ == '__main__':
-    app.run_server(debug=False, use_reloader=False, port=7920)
+#     app.run_server(debug=False, use_reloader=False, port=7920)
+    app.run_server(host='0.0.0.0', port=80, debug=False, use_reloader=False)
