@@ -1,19 +1,18 @@
 import cv2
-from matplotlib import pyplot as plt
-import time
-import re
-import pandas as pd
+#from matplotlib import pyplot as plt
+# import time
+# import re
+# import pandas as pd
 import os
 import numpy as np
-from PIL import Image
-import imutils
+# from PIL import Image
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import easyocr
-from sympy import Point, Polygon, Line
-from shapely.geometry import LineString, Point, Polygon
+from sympy import Polygon
+from shapely.geometry import LineString, Polygon
 import warnings
-import string
-import itertools
+# import string
+# import itertools
 warnings.filterwarnings('ignore')
 from contour import img_contour
 from image_process import img_processing

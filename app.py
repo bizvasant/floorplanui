@@ -1,5 +1,6 @@
 from dash import dcc, html, Input, Output
 import dash_bootstrap_components as dbc
+import os
 from main import app
 from app import onebhk, threebhk, twobhk
 
@@ -8,6 +9,18 @@ app.layout = html.Div(
      html.Div(id='page-content')])
 
 app.title = "Bizmetric Floor Plan System"
+
+
+try:
+    ext = ('.png', '.jpg', '.csv')
+    for file in os.listdir():
+        if file.endswith(ext):
+            print(file)
+            os.remove(file)
+except Exception as e: print(e)
+finally:
+    print("No garbage available")
+
 
 index_page = dbc.Container([html.H1('Floor Plan Usecase', style={'textAlign': 'center'}),html.Br(),
                            dbc.DropdownMenu([

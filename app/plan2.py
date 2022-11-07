@@ -40,6 +40,7 @@ def parse_contents(contents,filename):
     fig = px.imshow(img)
     fig.update_yaxes(tick0=0, dtick=200)
     fig.update_xaxes(tick0=0, dtick=200)
+    output = html.Div([dcc.Graph(figure=fig)])
     cv2.imwrite(filename, img)
     try:
         df1 = ocr.ocr_info(filename)
@@ -50,40 +51,45 @@ def parse_contents(contents,filename):
         df['Area in sq. ft.'] = df['Area in sq. ft.'].astype(str)
         df = df.replace('[\([{})\]]','',regex=True)
         table = dbc.Table.from_dataframe(df, bordered=True)
-        image = cv2.imread(filename)
-        contour, th = img_contour.find_contour(image)
-        x, y, w, h, cx, cy = img_contour.find_center(img, contour, th)
-        qads = img_contour.draw_contour(img, x, y, w, h, cx, cy)
-        fig_quad = px.imshow(qads)
-        from quadrants_area_1 import quadrants_area
-        qaud_info = quadrants_area.quad_area_info(image,filename)
-        qaud_info.to_csv("quads_img_2.csv", index=False)
-        qaud_df = pd.read_csv("quads_img_2.csv")
-        area_dist_df = qaud_df.groupby('Quadrant').Feature_Quadrant_area.sum().reset_index()
-        area_dist_df.rename(columns = {'Feature_Quadrant_area':'Area distribution per quadrant'}, inplace = True)
-        area_dist_df['Area distribution per quadrant'] = area_dist_df['Area distribution per quadrant'].astype(int)
-        
-        area_dist_df.rename(columns= {'Area distribution per quadrant':'Total Area of Quadrant (Sq. ft.)'},inplace = True)       
-               
-        area_dist = dbc.Table.from_dataframe(area_dist_df, bordered=True, style={'textAlign': 'center'})
-
-        qaud_df.rename(columns = 
-        {'Actual_area':'Feature Area (Sq. ft.)','Feature_Quadrant_area':'Feature Area in Quadrant (Sq. ft.)' },
-        inplace = True)
-        
-        qaud_info = dbc.Table.from_dataframe(qaud_df, bordered=True)
-
-
-        # fig_quad.update_yaxes(visible=False)
-        # fig_quad.update_xaxes(visible=False)
-        fig_quad.update_yaxes(tick0=0, dtick=200)
-        fig_quad.update_xaxes(tick0=0, dtick=200)
-        from app import summary
-        output = html.Div([dcc.Graph(figure=fig), table,
-                dcc.Graph(figure=fig_quad),area_dist,
-                qaud_info, summary.layout])
+        output = html.Div([dcc.Graph(figure=fig), table])
+        try:
+            image = cv2.imread(filename)
+            contour, th = img_contour.find_contour(image)
+            x, y, w, h, cx, cy = img_contour.find_center(img, contour, th)
+            qads = img_contour.draw_contour(img, x, y, w, h, cx, cy)
+            fig_quad = px.imshow(qads)
+            output = html.Div([dcc.Graph(figure=fig), table,
+            dcc.Graph(figure=fig_quad)])
+            try:
+                from quadrants_area_1 import quadrants_area
+                qaud_info = quadrants_area.quad_area_info(image,filename)
+                qaud_info.to_csv("quads_img_2.csv", index=False)
+                qaud_df = pd.read_csv("quads_img_2.csv")
+                area_dist_df = qaud_df.groupby('Quadrant').Feature_Quadrant_area.sum().reset_index()
+                area_dist_df.rename(columns = {'Feature_Quadrant_area':'Area distribution per quadrant'}, inplace = True)
+                area_dist_df['Area distribution per quadrant'] = area_dist_df['Area distribution per quadrant'].astype(int)
+                area_dist_df.rename(columns= {'Area distribution per quadrant':'Total Area of Quadrant (Sq. ft.)'},inplace = True)       
+                area_dist = dbc.Table.from_dataframe(area_dist_df, bordered=True, style={'textAlign': 'center'})
+                qaud_df.rename(columns = 
+                {'Actual_area':'Feature Area (Sq. ft.)','Feature_Quadrant_area':'Feature Area in Quadrant (Sq. ft.)' },
+                inplace = True)
+                qaud_info = dbc.Table.from_dataframe(qaud_df, bordered=True)
+                # fig_quad.update_yaxes(visible=False)
+                # fig_quad.update_xaxes(visible=False)
+                fig_quad.update_yaxes(tick0=0, dtick=200)
+                fig_quad.update_xaxes(tick0=0, dtick=200)
+                from app import summary
+                output = html.Div([dcc.Graph(figure=fig), table,
+                        dcc.Graph(figure=fig_quad),area_dist,
+                        qaud_info, summary.layout])
+            except:
+                output = html.Div([dcc.Graph(figure=fig), table,
+                dcc.Graph(figure=fig_quad), html.H3("Area distribution is not generated for provided image.")])
+        except:
+            output = html.Div([dcc.Graph(figure=fig), table,
+            html.H3("Quadrants are not drawn correctly for provided image.")])
     except:
-        output = html.H3(["Please provide a valid image as per provided assumptions"])
+        output = html.Div([dcc.Graph(figure=fig), html.H3("OCR code is not working for provided image.")])
     return html.Div([output])         
 
 
