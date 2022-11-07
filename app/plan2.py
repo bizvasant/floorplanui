@@ -84,12 +84,12 @@ def parse_contents(contents,filename):
                         qaud_info, summary.layout])
             except:
                 output = html.Div([dcc.Graph(figure=fig), table,
-                dcc.Graph(figure=fig_quad), html.H3("Area distribution is not generated for provided image.")])
+                dcc.Graph(figure=fig_quad), html.H3("Unable to calculate the area of features for provided image.")])
         except:
             output = html.Div([dcc.Graph(figure=fig), table,
             html.H3("Quadrants are not drawn correctly for provided image.")])
     except:
-        output = html.Div([dcc.Graph(figure=fig), html.H3("OCR code is not working for provided image.")])
+        output = html.Div([dcc.Graph(figure=fig), html.H3("Unable to fetch textual information from provided image.")])
     return html.Div([output])         
 
 
