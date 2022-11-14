@@ -48,6 +48,8 @@ class quadrants_area(quadrants):
         else :
             print('find_rooms_wo_lines')
             colored_house, room_mapping = quadrants.find_rooms_with_lines(image)
+
+        colored_house, room_mapping = quadrants.find_rooms_wo_lines(image)
         
         im_rgb = cv2.cvtColor(colored_house, cv2.COLOR_BGR2RGB)
         room_color = room_mapping['color']

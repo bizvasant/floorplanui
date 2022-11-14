@@ -1,9 +1,11 @@
 import plotly.express as px
 from dash import Input, Output, html, dcc, State
 import cv2
+import os
 import dash_bootstrap_components as dbc
 import numpy as np
 import pandas as pd
+from best_features import best_features
 from main import app
 import warnings
 import base64
@@ -78,10 +80,10 @@ def parse_contents(contents,filename):
                 # fig_quad.update_xaxes(visible=False)
                 fig_quad.update_yaxes(tick0=0, dtick=200)
                 fig_quad.update_xaxes(tick0=0, dtick=200)
-                from app import summary
+                # from app import summary
                 output = html.Div([dcc.Graph(figure=fig), table,
                         dcc.Graph(figure=fig_quad),area_dist,
-                        qaud_info, summary.layout])
+                        qaud_info, summary_layout])
             except:
                 output = html.Div([dcc.Graph(figure=fig), table,
                 dcc.Graph(figure=fig_quad), html.H3("Unable to calculate the area of features for provided image.")])
@@ -103,3 +105,56 @@ def update_output(list_of_contents, list_of_names):
             for c, n in zip(list_of_contents, list_of_names)
         ]
         return children
+
+
+summary_layout = html.Div([html.Br(), dbc.Button("Summary", id="button", external_link=True,
+                              style={"background-color": "#292929", "height": "40px"}), html.Br(), # NOQA E501
+                   html.Div(id="summary")])  # NOQA E501
+
+@app.callback(
+    Output("summary", "children"),
+    Input("button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def func(n_clicks):
+    df1 = pd.read_csv("data_img_1.csv")
+    df2 = pd.read_csv("data_img_2.csv")
+
+    # data_1 = best_features.pre_process(df1)
+    # data_2 = best_features.pre_process(df2)
+
+    print("dataframed are read")
+
+    output_file = best_features.best_feature(df1,df2)
+
+    print("got best features")
+    df = output_file.head(20)
+
+    df.to_csv("best_features.csv",index= False)
+    feature_df = pd.read_csv("best_features.csv")
+
+    if feature_df["floorplan_1"].sum() > feature_df["floorplan_2"].sum():
+        conclusion = "Floor plan 1 is better than Floor plan 2."
+    if feature_df["floorplan_1"].sum() < feature_df["floorplan_2"].sum():
+        conclusion = "Floor plan 2 is better than Floor plan 1."
+    if feature_df["floorplan_1"].sum() == feature_df["floorplan_2"].sum():
+        conclusion = "Floor plan 1 and Floor plan 2 both are same."
+
+    summary, df_comp = best_features.comp(df)
+
+    try:
+        ext = ('.png', '.jpg', '.csv')
+        for file in os.listdir():
+            if file.endswith(ext):
+                print("Removing ", file)
+                os.remove(file)
+    except Exception as e: print(e)
+    finally:
+        print("No garbage available")
+
+    return dbc.Container([html.H3("Plan Comparison", className="display-6",
+            style={'textAlign': 'left'}),
+    dbc.Table.from_dataframe(df_comp, bordered=True),
+    html.H3("Conclusion", className="display-6",
+            style={'textAlign': 'left'}),
+    dbc.Card(html.P(conclusion), body=True)])

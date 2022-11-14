@@ -27,8 +27,6 @@ class quadrants_area(quadrants):
             print(key)
             image = cv2.resize(image, (name_dict[key][0], name_dict[key][1]))
         
-       
-        
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         ret, thresh = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY)
         cv2.bitwise_not(thresh, thresh)
@@ -43,14 +41,14 @@ class quadrants_area(quadrants):
         cx = int(M['m10'] / M['m00'])
         cy = int(M['m01'] / M['m00'])
 
-
-
         if key == '3bhk_sample2' or key == '1bhk_sample2':
             print('find_rooms_with_lines')
             colored_house, room_mapping = quadrants.find_rooms_wo_lines(image)
         else :
             print('find_rooms_wo_lines')
             colored_house, room_mapping = quadrants.find_rooms_with_lines(image)
+
+        colored_house, room_mapping = quadrants.find_rooms_wo_lines(image)    
         
         im_rgb = cv2.cvtColor(colored_house, cv2.COLOR_BGR2RGB)
         room_color = room_mapping['color']
