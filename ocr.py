@@ -68,7 +68,7 @@ class ocr:
                 spos=pos-4
         #         print(spos,df.iloc[i]['area'][spos:])
                 df.loc[i,'area']=df.loc[i,'area'][spos:].replace(')',' ')
-    #     df0=df.copy()        
+        # df0=df.copy()        
         for i in range(len(df)):
             if df.loc[i,'area'].lower().find('m')>0:
                 l=df.loc[i,'area'].lower().split('m')
